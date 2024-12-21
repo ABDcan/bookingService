@@ -1,17 +1,18 @@
 const { Booking } = require("../models");
-const ValidationError = require("../utils/errors/validation-error");
-const { Apperror,ValidationError } = require("../utils/errors");
+const { AppError,validationError } = require("../utils/errors");
 const {StatusCodes } = require("http-status-codes");
 class BookingRepository {
-  async createBooking(data) {
+  async create(data) {
     try {
+      console.log("Inside Booking Repository");
       const booking = await Booking.create(data);
+      console.log("booking done", booking);
       return booking;
     } catch (error) {
-        if (error.name == "SequelizeValidationError") {
-          throw new ValidationError(error);
-        }
       console.log("Something went wrong in the repository layer");
+        if (error.name === 'SequelizeValidationError') {
+          throw new validationError(error);
+        }
       throw  new AppError('RepositoryError','Connot create Booking','There was some issue creating the booking, please try again later',StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
